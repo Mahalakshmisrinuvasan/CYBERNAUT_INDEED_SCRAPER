@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indeed Scraper Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f4f6fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Header */
+        .page-header {
+            background: linear-gradient(90deg, #0072ff, #00c6ff);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .page-header h1 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .page-header p {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        /* Table */
+        table thead {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+        }
+        table tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+
+        /* Cards */
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: #fff;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .fallback {
+            text-align: center;
+            padding: 40px 0;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Indeed Scraper Results</h1>
+        <p>Showing results for "<b>{{ keyword }}</b>" in "<b>{{ location }}</b>"</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-center mb-4">
+        <a href="/" class="btn btn-secondary me-2">🔍 New Search</a>
+        <a href="/download_csv" class="btn btn-success me-2">⬇️ Download CSV</a>
+        <a href="/download_pdf" class="btn btn-danger">📄 Download PDF</a>
+
+    </div>
+
+    <!-- ------------------- JOB TABLE ------------------- -->
+    {% if jobs %}
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle shadow-sm">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Company</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                    <th>Link</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td>
+                        {% if job.URL %}
+                        <a href="{{ job.URL }}" target="_blank">{{ job.Title }}</a>
+                        {% else %}
+                        {{ job.Title }}
+                        {% endif %}
+                    </td>
+                    <td>{{ job.Company }}</td>
+                    <td>{{ job.Location }}</td>
+                    <td>{{ job.Date }}</td>
+                    <td>
+                        {% if job.URL %}
+                        <a href="{{ job.URL }}" target="_blank" class="btn btn-sm btn-primary">View</a>
+                        {% else %}N/A{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center text-muted mt-5">
+        <h4>⚠️ No jobs found for "{{ keyword }}" in "{{ location }}"</h4>
+    </div>
+    {% endif %}
+
+    <!-- ------------------- ANALYTICS ------------------- -->
+    <div class="row analysis-section g-4 mt-5">
+        <!-- Top Companies -->
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <h5 class="card-title">Top Hiring Companies</h5>
+                {% if top_companies_exists %}
+                    <img src="{{ url_for('static', filename='top_companies.png') }}" alt="Top Companies" class="img-fluid">
+                {% else %}
+                    <div class="fallback">⚠️ No company data</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Jobs by Location -->
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <h5 class="card-title">Jobs by Location</h5>
+                {% if jobs_by_location_exists %}
+                    <img src="{{ url_for('static', filename='jobs_by_location.png') }}" alt="Jobs by Location" class="img-fluid">
+                {% else %}
+                    <div class="fallback">⚠️ No location data</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Word Cloud -->
+        <div class="col-md-4">
+            <div class="card p-3 text-center">
+                <h5 class="card-title">Job Description Word Cloud</h5>
+                {% if wordcloud_exists %}
+                    <img src="{{ url_for('static', filename='wordcloud.png') }}" alt="Word Cloud" class="img-fluid">
+                {% else %}
+                    <div class="fallback">⚠️ No descriptions available</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
